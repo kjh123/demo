@@ -1,0 +1,17 @@
+syntax="proto3";
+
+option go_package="proto/users.v1";
+
+package users;
+
+service UserServer {
+  rpc Register(UserRequest) returns (UserResponse) {}
+}
+
+message UserRequest {
+  string name = 1;
+}
+
+message UserResponse {
+  string message = 1;
+}

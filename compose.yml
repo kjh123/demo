@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=demo
+    volumes:
+      - .local/mysql:/var/lib/mysql
+
+  server:
+    build:
+      context: .
+      target: server
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 8000:8000
+    depends_on:
+      - mysql
+    command:
+      - "./hello-server"
+      - "--addr"
+      - ":8000"
+      - "--mysql"
+      - "root:admin@tcp(mysql)/demo?parseTime=true"
+
+  client:
+    build:
+      context: .
+      target: client
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+      - server
+    command:
+      - "./hello-client"
+      - "--server-domain"
+      - "server:8000"
+      - "--addr"
+      - ":8080"
+      - "--mysql"
+      - "root:admin@tcp(mysql)/demo?parseTime=true"
