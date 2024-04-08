@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"data"
+	"event"
 	"github.com/alecthomas/kong"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -11,19 +12,26 @@ import (
 )
 
 var ServerConf struct {
-	Addr  string `default:":8000"`
-	Mysql string
+	Addr       string `default:":8000"`
+	Mysql      string
+	KafkaAddr  string `name:"kafka-addr"`
+	KafkaTopic string `name:"kafka-topic"`
 }
 
 func main() {
 	kong.Parse(&ServerConf)
 	app := fx.New(
+		event.Module,
 		data.Module,
 		fx.Provide(
 			NewServer,
 		),
 
-		fx.Supply(fx.Annotate(ServerConf.Mysql, fx.ResultTags(`name:"mysql_dsn"`))),
+		fx.Supply(
+			fx.Annotate(ServerConf.Mysql, fx.ResultTags(`name:"mysql_dsn"`)),
+			fx.Annotate(ServerConf.KafkaAddr, fx.ResultTags(`name:"kafka_addr"`)),
+			fx.Annotate(ServerConf.KafkaTopic, fx.ResultTags(`name:"kafka_topic"`)),
+		),
 
 		fx.Invoke(func(s *grpc.Server, lifecycle fx.Lifecycle) {
 			lifecycle.Append(fx.Hook{
@@ -49,6 +57,7 @@ func main() {
 		}),
 
 		fx.Invoke(setupServer),
+		fx.Invoke(Receiver),
 	)
 	app.Run()
 }

@@ -41,7 +41,7 @@ func (i *mockWriter) Header() http.Header {
 	return i.header
 }
 
-func (i *mockWriter) Write(b []byte) (int, error) {
+func (i *mockWriter) Write(_ []byte) (int, error) {
 	return 0, nil
 }
 

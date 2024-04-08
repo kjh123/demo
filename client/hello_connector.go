@@ -27,9 +27,12 @@ func NewHelloConnect(params ServeConnectParams) *HelloConnect {
 	return &HelloConnect{ServerDomain: params.ServerDomain}
 }
 
-func (h *HelloConnect) CallServer(ctx context.Context, request *api.HelloRequest) (*api.HelloResponse, error) {
-	conn, err := grpc.Dial(h.ServerDomain, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	defer conn.Close()
+func (h *HelloConnect) CallServer(ctx context.Context, request *api.HelloRequest) (resp *api.HelloResponse, err error) {
+	var conn *grpc.ClientConn
+	conn, err = grpc.Dial(h.ServerDomain, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	defer func() {
+		err = conn.Close()
+	}()
 	if err != nil {
 		return nil, err
 	}
