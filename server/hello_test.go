@@ -2,9 +2,10 @@ package main
 
 import (
 	"api"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"testing"
 )
 
 func TestHelloService_Hello(t *testing.T) {

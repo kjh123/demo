@@ -4,10 +4,11 @@ import (
 	"context"
 	"data"
 	"event"
+	"net/http"
+
 	"github.com/alecthomas/kong"
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
-	"net/http"
 )
 
 var ClientConf struct {

@@ -4,11 +4,12 @@ import (
 	"context"
 	"data"
 	"event"
+	"log/slog"
+	"net"
+
 	"github.com/alecthomas/kong"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
-	"log/slog"
-	"net"
 )
 
 var ServerConf struct {
@@ -35,7 +36,7 @@ func main() {
 
 		fx.Invoke(func(s *grpc.Server, lifecycle fx.Lifecycle) {
 			lifecycle.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
+				OnStart: func(_ context.Context) error {
 					lis, err := net.Listen("tcp", ServerConf.Addr)
 					if err != nil {
 						return err
@@ -49,7 +50,7 @@ func main() {
 					}(lis)
 					return nil
 				},
-				OnStop: func(ctx context.Context) error {
+				OnStop: func(_ context.Context) error {
 					s.Stop()
 					return nil
 				},

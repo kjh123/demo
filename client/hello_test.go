@@ -3,13 +3,14 @@ package main
 import (
 	"api"
 	"context"
+	"net/http"
+	"net/url"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"net/url"
-	"testing"
 )
 
 var _ HelloConnector = (*mockHelloConnector)(nil)

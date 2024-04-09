@@ -3,10 +3,11 @@ package main
 import (
 	"api"
 	"context"
+	"time"
+
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"time"
 )
 
 type HelloConnector interface {

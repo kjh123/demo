@@ -3,9 +3,10 @@ package main
 import (
 	"api"
 	"context"
+	"time"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"time"
 )
 
 type UserConnector interface {
@@ -20,9 +21,12 @@ func NewUserConnect(params ServeConnectParams) *UserConnect {
 	return &UserConnect{ServerDomain: params.ServerDomain}
 }
 
-func (u *UserConnect) CallServeUser(ctx context.Context, request *api.UserRequest) (*api.UserResponse, error) {
-	conn, err := grpc.Dial(u.ServerDomain, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	defer conn.Close()
+func (u *UserConnect) CallServeUser(ctx context.Context, request *api.UserRequest) (response *api.UserResponse, err error) {
+	var conn *grpc.ClientConn
+	conn, err = grpc.Dial(u.ServerDomain, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	defer func() {
+		err = conn.Close()
+	}()
 
 	if err != nil {
 		return nil, err
@@ -33,6 +37,6 @@ func (u *UserConnect) CallServeUser(ctx context.Context, request *api.UserReques
 	cancelCtx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	r, err := c.Register(cancelCtx, request)
-	return r, err
+	response, err = c.Register(cancelCtx, request)
+	return
 }

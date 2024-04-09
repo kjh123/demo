@@ -4,8 +4,9 @@ import (
 	"api"
 	"context"
 	"data"
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 var ErrEmpty = errors.New("empty user")

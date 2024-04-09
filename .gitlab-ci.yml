@@ -1,0 +1,68 @@
+default:
+  tags:
+    - docker
+
+.go:
+  image: golang:1.21
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+    - mkdir -p .go
+  cache:
+    key: go
+    paths:
+      - .go/pkg/mod
+
+stages:
+  - build
+  - test
+  - lint
+  - deploy
+
+build:
+  extends: .go
+  stage: build
+  script:
+    - go build -o demo-client-$CI_COMMIT_SHORT_SHA ./client
+    - go build -o demo-server-$CI_COMMIT_SHORT_SHA ./server
+
+test:
+  extends: .go
+  stage: test
+  image: golang:1.21
+  before_script:
+    - export PATH=$PATH:$GOPATH/bin
+    - go install github.com/axw/gocov/gocov@latest
+    - go install github.com/kyoh86/richgo@latest
+  variables:
+    RICHGO_FORCE_COLOR: 1
+  script:
+    - richgo test -v ./client/... -coverprofile=coverage-client.out -covermode count
+    - richgo test -v ./server/... -coverprofile=coverage-server.out -covermode count
+    - gocov convert coverage-client.out | gocov annotate -
+    - gocov test ./client/... | gocov report
+    - gocov convert coverage-server.out | gocov annotate -
+    - gocov test ./server/... | gocov report
+
+lint:
+  extends: .go
+  stage: lint
+  image: golang:1.21
+  before_script:
+    - export PATH=$PATH:$GOPATH/bin
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+  script:
+    - golangci-lint run ./client/... --timeout=5m
+    - golangci-lint run ./server/... --timeout=5m
+
+deploy:
+  image: docker:dind
+  stage: deploy
+  when: manual
+  before_script:
+    - docker --version || echo 'Docker CLI not found'
+    - which dockerd || echo 'Docker daemon not found'
+    - dockerd --version || echo 'Docker daemon version command failed'
+    - dockerd &
+  script:
+    - docker compose up -d --build

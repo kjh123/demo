@@ -3,8 +3,9 @@ package main
 import (
 	"api"
 	"data"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserService struct {

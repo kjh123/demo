@@ -3,6 +3,7 @@ package main
 import (
 	"event/event"
 	"event/kafka"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
 )

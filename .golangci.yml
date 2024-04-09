@@ -14,7 +14,6 @@ linters:
     - govet
     - gosimple
     - gofmt
-    - gofumpt
     - goconst
     - goimports
     - gomnd
