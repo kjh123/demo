@@ -1,0 +1,49 @@
+
+syntax = "proto3";
+
+package hello;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "proto/hello.v1";
+
+message PatchData {
+  string path = 1
+      [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "实体属性字段"
+      }];
+  string operator = 2
+      [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "操作类型"
+      }];
+  bytes value = 3
+      [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "实体数值"
+      }];
+}
+
+message PatchDatas {
+  repeated PatchData patches = 1;
+}
+
+message SystemData {
+  string operator = 1;
+  bytes data = 2;
+}
+
+message SyncData {
+  repeated string paths = 1;
+  bytes state = 2;
+}
+
+message ProtoEvent {
+  string id = 1;
+  int64 timestamp = 2;
+  string callback = 3;
+  map<string, string> metadata = 4;
+  oneof data {
+    bytes raw_data = 8;
+    PatchDatas patches = 9;
+    SystemData system_data = 10;
+  }
+}

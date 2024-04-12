@@ -65,14 +65,14 @@ services:
     environment:
       - TZ=Asia/Shanghai
     ports:
-      - "8000:8000"
+      - "${SERVER_PORT}:8000"
     depends_on:
       - kafka
       - mysql
     command:
       - "./hello-server"
       - "--addr"
-      - ":8000"
+      - ":${SERVER_PORT}"
       - "--mysql"
       - "root:admin@tcp(mysql)/${MYSQL_DB_NAME}?parseTime=true"
       - "--kafka-addr"
@@ -90,25 +90,33 @@ services:
     environment:
       - TZ=Asia/Shanghai
     ports:
-      - "8080:8080"
+      - "${CLIENT_PORT}:8080"
     depends_on:
       - kafka
       - mysql
     command:
       - "./hello-client"
       - "--server-domain"
-      - "server:8000"
+      - "server:${SERVER_PORT}"
       - "--addr"
-      - ":8080"
+      - ":${CLIENT_PORT}"
       - "--mysql"
       - "root:admin@tcp(mysql)/${MYSQL_DB_NAME}?parseTime=true"
       - "--kafka-addr"
       - "kafka"
       - "--kafka-topic"
       - ${KAFKA_TOPIC}
+      - "--clickhouse-host"
+      - "clickhouse:9000"
+      - "--clickhouse-db"
+      - ${CLICKHOUSE_DB_NAME}
     networks:
       - backend
+      - logs_logs
 
 networks:
   backend:
     driver: bridge
+  logs_logs:
+    external:
+      name: logs_logs

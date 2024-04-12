@@ -2,9 +2,10 @@ package data
 
 import (
 	"context"
-	"github.com/jmoiron/sqlx"
 	"log/slog"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type UserQueryer interface {

@@ -1,20 +1,29 @@
 package data
 
 import (
+	"context"
+	"data/logs"
+
 	"github.com/go-sql-driver/mysql"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/fx"
 )
 
 var Module = fx.Module(
 	"data",
+	logs.Module,
 	fx.Provide(
 		setupData,
 
 		fx.Annotate(NewUserRepository, fx.As(new(UserQueryer))),
 		fx.Annotate(NewUserRepository, fx.As(new(UserCommander))),
 	),
+
+	fx.Invoke(func(db *sqlx.DB, lifecycle fx.Lifecycle) {
+		lifecycle.Append(fx.Hook{OnStop: func(_ context.Context) error {
+			return db.Close()
+		}})
+	}),
 )
 
 type Params struct {

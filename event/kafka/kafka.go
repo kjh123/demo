@@ -3,8 +3,9 @@ package kafka
 import (
 	"context"
 	"event/event"
-	"github.com/segmentio/kafka-go"
 	"log/slog"
+
+	"github.com/segmentio/kafka-go"
 )
 
 var (
@@ -71,7 +72,7 @@ type kafkaReceiver struct {
 	topic  string
 }
 
-func (k *kafkaReceiver) Receive(ctx context.Context, handler event.Handler) error {
+func (k *kafkaReceiver) Receive(_ context.Context, handler event.Handler) error {
 	go func() {
 		for {
 			m, err := k.reader.FetchMessage(context.Background())

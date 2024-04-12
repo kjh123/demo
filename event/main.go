@@ -4,6 +4,7 @@ import (
 	"context"
 	"event/event"
 	"event/kafka"
+
 	"go.uber.org/fx"
 )
 
